@@ -1,12 +1,6 @@
-print("[lua] Hello World!")
+local label1 = tsuki.lib.label.new()
+tsuki.lib.label.set_text(label1, "This is a work in progress...")
 
-print(type(tsuki.window))
-
-local window = tsuki.window({})
-print("created window")
-
-local label = tsuki.lib.label.new()
-print("created label")
-tsuki.lib.window.set_child(window, label)
-
-tsuki.lib.window.present(window)
+local window1 = tsuki.lib.window.new()
+tsuki.lib.window.set_child(window1, label1)
+tsuki.lib.window.present(window1)

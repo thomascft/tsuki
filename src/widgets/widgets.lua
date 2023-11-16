@@ -1,7 +1,5 @@
 local widget = {}
 
-
-
 local widgetMetatable = {
 	__index = function (w, k)
 		local field = w.__indexMap[k]
@@ -10,17 +8,15 @@ local widgetMetatable = {
 		end
 	end,
 	__indexMap = {
-		["class"] = tsuki.lib.widget.set_class(),
-		["valign"] = tsuki.lib.widget.set_valign(),
-		["halign"] = tsuki.lib.widget.set_halign(),
-		["vexpand"] = tsuki.lib.widget.set_vexpand(),
-		["hexpand"] = tsuki.lib.widget.set_hexpand(),
-		["width"] = tsuki.lib.widget.set_width(),
-		["height"] = tsuki.lib.widget.set_height(),
-		["active"] = tsuki.lib.widget.set_active(),
-		["tooltip"] = tsuki.lib.widget.set_tooltip(),
-		["visible"] = tsuki.lib.widget.set_visible(),
-		["style"] = tsuki.lib.widget.set_style(),
+		["class"] = tsuki.lib.widget.get_class(),
+		["valign"] = tsuki.lib.widget.get_valign(),
+		["halign"] = tsuki.lib.widget.get_halign(),
+		["vexpand"] = tsuki.lib.widget.get_vexpand(),
+		["hexpand"] = tsuki.lib.widget.get_hexpand(),
+		["width"] = tsuki.lib.widget.get_width(),
+		["height"] = tsuki.lib.widget.get_height(),
+		["tooltip"] = tsuki.lib.widget.get_tooltip(),
+		["visible"] = tsuki.lib.widget.get_visible(),
 	},
 	__newindex = function (w, k, o)
 		local field = w.__indexMap[k]
@@ -29,20 +25,15 @@ local widgetMetatable = {
 		end
 	end,
 	__newIndexMap = {
-		["class"] = tsuki.lib.widget.get_class(),
-		["valign"] = tsuki.lib.widget.get_valign(),
-		["halign"] = tsuki.lib.widget.get_halign(),
-		["vexpand"] = tsuki.lib.widget.get_vexpand(),
-		["hexpand"] = tsuki.lib.widget.get_hexpand(),
-		["width"] = tsuki.lib.widget.get_width(),
-		["height"] = tsuki.lib.widget.get_height(),
-		["active"] = tsuki.lib.widget.get_active(),
-		["tooltip"] = tsuki.lib.widget.get_tooltip(),
-		["visible"] = tsuki.lib.widget.get_visible(),
+		["class"] = tsuki.lib.widget.set_class(),
+		["valign"] = tsuki.lib.widget.set_valign(),
+		["halign"] = tsuki.lib.widget.set_halign(),
+		["vexpand"] = tsuki.lib.widget.set_vexpand(),
+		["hexpand"] = tsuki.lib.widget.set_hexpand(),
+		["size"] = tsuki.lib.widget.set_size(),
+		["tooltip"] = tsuki.lib.widget.set_tooltip(),
+		["visible"] = tsuki.lib.widget.set_visible(),
 	},
-	__call = function ()
-		
-	end
 }
 
 tsuki.window = function (opts)
