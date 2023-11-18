@@ -321,6 +321,4 @@ void tsuki_widget_register_fns(lua_State *L) {
 	lua_setfield(L, 2, "label");
 	
 	lua_setfield(L, 1, "lib");
-
-	luaL_dofile(L, "/home/thomas/Projects/tsuki/src/widgets/widgets.lua");
 }

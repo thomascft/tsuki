@@ -6,7 +6,7 @@
 
 #include <gtk/gtk.h>
 
-#include "widgets/widgets.c"
+#include "widgets.c"
 
 
 void activate(GtkApplication *app, gpointer user_data) {

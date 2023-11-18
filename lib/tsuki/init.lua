@@ -1,0 +1,1 @@
+local widget = require((...) .. ".widget")
