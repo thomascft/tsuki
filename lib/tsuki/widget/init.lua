@@ -1,62 +1,66 @@
-local widget = {}
+local _M = {}
 
 local widgetMetatable = {
-	__index = function (w, k)
-		local field = w.__indexMap[k]
-		if field ~= nil then
-			field(w)
+	__indexmap = {
+		["class"] = tsukisys.lib.widget.get_classes,
+		["valign"] = tsukisys.lib.widget.get_valign,
+		["halign"] = tsukisys.lib.widget.get_halign,
+		["vexpand"] = tsukisys.lib.widget.get_vexpand,
+		["hexpand"] = tsukisys.lib.widget.get_hexpand,
+		["width"] = tsukisys.lib.widget.get_width,
+		["height"] = tsukisys.lib.widget.get_height,
+		["tooltip"] = tsukisys.lib.widget.get_tooltip,
+		["visible"] = tsukisys.lib.widget.get_visible,
+	},
+	__newindexmap = {
+		["class"] = tsukisys.lib.widget.set_classes,
+		["valign"] = tsukisys.lib.widget.set_valign,
+		["halign"] = tsukisys.lib.widget.set_halign,
+		["vexpand"] = tsukisys.lib.widget.set_vexpand,
+		["hexpand"] = tsukisys.lib.widget.set_hexpand,
+		["size"] = tsukisys.lib.widget.set_size,
+		["tooltip"] = tsukisys.lib.widget.set_tooltip,
+		["visible"] = tsukisys.lib.widget.set_visible,
+	},
+	__index = function (widget, field)
+		local metatable = getmetatable(widget)
+		local fieldGetter = metatable.__indexmap[field]
+
+		if fieldGetter then
+			return fieldGetter(widget)
+		else
+			warn("Invalid field: " .. field)
 		end
 	end,
-	__indexMap = {
-		["class"] = tsuki.lib.widget.get_class(),
-		["valign"] = tsuki.lib.widget.get_valign(),
-		["halign"] = tsuki.lib.widget.get_halign(),
-		["vexpand"] = tsuki.lib.widget.get_vexpand(),
-		["hexpand"] = tsuki.lib.widget.get_hexpand(),
-		["width"] = tsuki.lib.widget.get_width(),
-		["height"] = tsuki.lib.widget.get_height(),
-		["tooltip"] = tsuki.lib.widget.get_tooltip(),
-		["visible"] = tsuki.lib.widget.get_visible(),
-	},
-	__newindex = function (w, k, o)
-		local field = w.__indexMap[k]
-		if field ~= nil then
-			field(w, o)
+	__newindex = function (widget, field, value)
+		local metatable = getmetatable(widget)
+		local fieldSetter = metatable.__newindexmap[field]
+
+		if fieldSetter then
+			return fieldSetter(widget, value)
+		else
+			warn("Invalid field: " .. field)
 		end
-	end,
-	__newIndexMap = {
-		["class"] = tsuki.lib.widget.set_class(),
-		["valign"] = tsuki.lib.widget.set_valign(),
-		["halign"] = tsuki.lib.widget.set_halign(),
-		["vexpand"] = tsuki.lib.widget.set_vexpand(),
-		["hexpand"] = tsuki.lib.widget.set_hexpand(),
-		["size"] = tsuki.lib.widget.set_size(),
-		["tooltip"] = tsuki.lib.widget.set_tooltip(),
-		["visible"] = tsuki.lib.widget.set_visible(),
-	},
+	end
 }
 
-tsuki.window = function (opts)
-	local window = tsuki.lib.window.new()
+_M.label = function (opts)
 
-	return window
-end
+	opts = opts or {}
 
-tsuki.widget = {}
-
-tsuki.widget.label = function (opts)
-	local widget = tsuki.lib.label.new()
+	local widget = tsukisys.lib.label.new()
 	local labelMetatable = widgetMetatable
 
-	labelMetatable.__indexMap["text"] = tsuki.lib.label.set_text()
-	labelMetatable.__newIndexMap["text"] = tsuki.lib.label.get_text()
+	labelMetatable.__indexmap["text"] = tsukisys.lib.label.get_text
+	labelMetatable.__newindexmap["text"] = tsukisys.lib.label.set_text
 
-	setmetatable(widget, labelMetatable)
+	tsukisys.lib.helper.set_metatable(widget, labelMetatable)
 
-	for k,v in ipairs(opts) do
+	for k,v in pairs(opts) do
 		widget[k] = v
 	end
 
 	return widget
 end
 
+return _M

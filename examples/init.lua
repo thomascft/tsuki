@@ -1,6 +1,12 @@
-local label1 = tsuki.lib.label.new()
-tsuki.lib.label.set_text(label1, "This is a work in progress...")
+local tsuki = require("tsuki")
 
-local window1 = tsuki.lib.window.new()
-tsuki.lib.window.set_child(window1, label1)
-tsuki.lib.window.present(window1)
+local label2 = tsukisys.lib.label.new()
+local label1 = tsuki.widget.label({
+	text = "Hello World!",
+})
+
+label1.text = "Erm..."
+
+local window1 = tsukisys.lib.window.new()
+tsukisys.lib.window.set_child(window1, label1)
+tsukisys.lib.window.present(window1)

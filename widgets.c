@@ -59,7 +59,7 @@ int l_tsuki_widget_get_classes(lua_State *L) {
 	GtkWidget *widget = *widget_ud;
 	char **classes = gtk_widget_get_css_classes(widget);
 
-	lua_newtable(L); // idx 2
+	lua_newtable(L);
 	
 	for (int i = 0; classes[i] != NULL; i++ ) {
 		lua_pushstring(L, classes[i]);
@@ -307,8 +307,20 @@ static const luaL_Reg l_tsuki_label_fns[] = {
 	{NULL, NULL}
 };
 
+int l_tsuki_helper_set_metatable(lua_State *L) {
+	// FIXME: I wasn't able to set them metatable within the lua state, so this is my fix
+	lua_setmetatable(L, 1);
+
+	return 0;
+} 
+
+static const luaL_Reg l_tsuki_helper_fns[] = {
+	{"set_metatable", l_tsuki_helper_set_metatable},
+	{NULL, NULL}
+};
+
 void tsuki_widget_register_fns(lua_State *L) {
-	lua_getglobal(L, "tsuki");
+	lua_getglobal(L, "tsukisys");
 	lua_newtable(L); // The lib table
 	
 	luaL_newlib(L, l_tsuki_widget_fns);
@@ -319,6 +331,9 @@ void tsuki_widget_register_fns(lua_State *L) {
 
 	luaL_newlib(L, l_tsuki_label_fns);
 	lua_setfield(L, 2, "label");
+	
+	luaL_newlib(L, l_tsuki_helper_fns);
+	lua_setfield(L, 2, "helper");
 	
 	lua_setfield(L, 1, "lib");
 }
