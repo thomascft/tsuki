@@ -9,6 +9,7 @@
 #include <string.h>
 
 #include "widgets.c"
+#include "signals.c"
 
 void add_to_lua_path(lua_State *L) {
 	char new_path[1000] = "";
@@ -42,6 +43,7 @@ void activate(GtkApplication *app, gpointer user_data) {
 	lua_setglobal(L, "tsukilib");
 
 	l_tsuki_widget_fns_register(L);
+	l_tsuki_signal_fns_register(L);
 	add_to_lua_path(L);
 
 	if (LUA_OK != luaL_dofile(L, "/home/thomas/Projects/tsuki/examples/init.lua")){
