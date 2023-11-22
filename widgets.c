@@ -245,7 +245,7 @@ int l_tsuki_window_new(lua_State *L) {
 	app = lua_touserdata(L, -1);
 
 	GtkWidget *window = gtk_application_window_new(app);
-	GtkWidget **window_ud = lua_newuserdata(L, sizeof(window));
+	GtkWidget **window_ud = lua_newuserdata(L, sizeof(GtkWidget *));
 
 	*window_ud = window;
 
@@ -319,21 +319,20 @@ static const luaL_Reg l_tsuki_helper_fns[] = {
 	{NULL, NULL}
 };
 
-void tsuki_widget_register_fns(lua_State *L) {
-	lua_getglobal(L, "tsukisys");
-	lua_newtable(L); // The lib table
+void l_tsuki_widget_fns_register(lua_State *L) {
+	lua_getglobal(L, "tsukilib");
 	
 	luaL_newlib(L, l_tsuki_widget_fns);
-	lua_setfield(L, 2, "widget");
+	lua_setfield(L, 1, "widget");
 
 	luaL_newlib(L, l_tsuki_window_fns);
-	lua_setfield(L, 2, "window");
+	lua_setfield(L, 1, "window");
 
 	luaL_newlib(L, l_tsuki_label_fns);
-	lua_setfield(L, 2, "label");
+	lua_setfield(L, 1, "label");
 	
 	luaL_newlib(L, l_tsuki_helper_fns);
-	lua_setfield(L, 2, "helper");
+	lua_setfield(L, 1, "helper");
 	
-	lua_setfield(L, 1, "lib");
+	lua_pop(L, 1);
 }

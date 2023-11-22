@@ -39,9 +39,9 @@ void activate(GtkApplication *app, gpointer user_data) {
 	lua_setfield(L, LUA_REGISTRYINDEX, "GtkApplication");
 
 	lua_newtable(L);
-	lua_setglobal(L, "tsukisys");
+	lua_setglobal(L, "tsukilib");
 
-	tsuki_widget_register_fns(L);
+	l_tsuki_widget_fns_register(L);
 	add_to_lua_path(L);
 
 	if (LUA_OK != luaL_dofile(L, "/home/thomas/Projects/tsuki/examples/init.lua")){
