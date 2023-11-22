@@ -13,11 +13,10 @@
 
 void add_to_lua_path(lua_State *L) {
 	char new_path[1000] = "";
-	char tsuki_lib_path[1000] = "";
+	char *lib_path = getenv("TSUKI_LIB_PATH");
 
-	strcpy(tsuki_lib_path, getenv("TSUKI_LIB_PATH"));
-	if (!*tsuki_lib_path) {
-		strcpy(tsuki_lib_path, "/usr/share/tsuki/lib"); // TODO: Update this once it's ready for release
+	if (!lib_path) {
+		lib_path = "/usr/share/tsuki/lib";
 	}
 
 	lua_getglobal(L, "package");
@@ -25,7 +24,7 @@ void add_to_lua_path(lua_State *L) {
 	const char *current_path = lua_tostring(L, -1);
 	strcat(new_path, current_path);
 	strcat(new_path, ";");
-	strcat(new_path, tsuki_lib_path);
+	strcat(new_path, lib_path);
 	strcat(new_path, "/?/init.lua");
 	lua_pop(L, 1);
 	lua_pushstring(L, new_path);
@@ -46,7 +45,13 @@ void activate(GtkApplication *app, gpointer user_data) {
 	l_tsuki_signal_fns_register(L);
 	add_to_lua_path(L);
 
-	if (LUA_OK != luaL_dofile(L, "/home/thomas/Projects/tsuki/examples/init.lua")){
+	char *config_path = getenv("TSUKI_CONFIG_PATH");
+
+	if (!config_path) {
+		config_path = "~/.config/tsuki/init.lua";
+	}
+
+	if (LUA_OK != luaL_dofile(L, config_path)){
 		printf("%s\n", lua_tostring(L, -1));
 		lua_pop(L, 1);
 	}
