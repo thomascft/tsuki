@@ -1,5 +1,4 @@
-#ifndef WIDGETS_H_
-#define WIDGETS_H_
+#pragma once
 
 #include <lua.h>
 
@@ -36,5 +35,3 @@ int l_label_get_text(lua_State *L);
 int l_label_set_text(lua_State *L);
 
 void widget_fns_register(lua_State *L);
-
-#endif

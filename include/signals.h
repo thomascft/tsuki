@@ -1,5 +1,4 @@
-#ifndef SIGNAL_H_
-#define SIGNAL_H_
+#pragma once
 
 #include <lua.h>
 #include <gtk/gtk.h>
@@ -18,4 +17,3 @@ int l_signal_connect(lua_State *L);
 
 void signal_fns_register(lua_State *L);
 
-#endif 
