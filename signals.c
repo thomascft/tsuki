@@ -6,7 +6,7 @@
 
 typedef struct {
 	lua_State *L;
-	GtkWidget *widget;
+	int widget_ud_ref;
 	int fn_ref;
 	guint signal_id;
 } TsukiCallbackData;
@@ -15,8 +15,7 @@ bool tsuki_signal_time(gpointer P) {
 	TsukiCallbackData *data = (TsukiCallbackData *)P;
 	lua_State *L = data->L;
 	lua_rawgeti(L, LUA_REGISTRYINDEX, data->fn_ref);
-	GtkWidget **widget_ud = lua_newuserdata(L, sizeof(GtkWidget *));
-	*widget_ud = data->widget; 
+	lua_rawgeti(L, LUA_REGISTRYINDEX, data->widget_ud_ref);
 	lua_call(L, 1, 0);
 
 	return true;
@@ -24,18 +23,16 @@ bool tsuki_signal_time(gpointer P) {
 
 
 int l_tsuki_signal_connect(lua_State *L) {
-	GtkWidget **widget_ud = lua_touserdata(L, 1);
-	GtkWidget *widget = *widget_ud;
-
 	if (lua_isnumber(L, 2) == 1 && lua_isfunction(L, 3)) {
 		TsukiCallbackData *data = (TsukiCallbackData *)malloc(sizeof(TsukiCallbackData));
 		if (!data) {
 			return luaL_error(L, "Failed to allocate memory");
 		}
 
-		data->L = L;
-		data->widget = widget;
+		data->L = L; // FIXME: Investigate lua state lifetime
 		data->fn_ref = luaL_ref(L, LUA_REGISTRYINDEX);
+		lua_pushvalue(L, 1);
+		data->widget_ud_ref = luaL_ref(L, LUA_REGISTRYINDEX);
 		data->signal_id = g_timeout_add(lua_tonumber(L, 2), G_SOURCE_FUNC(tsuki_signal_time), data);
 	}
 

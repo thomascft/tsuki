@@ -1,5 +1,11 @@
 local _M = {}
 
+local function subscribe_signals(widget, signals)
+	for signal,callback in pairs(signals) do
+		tsukilib.signal.connect(widget, signal, callback)
+	end
+end
+
 local widgetMetatable = {
 	__indexmap = {
 		["class"] = tsukilib.widget.get_classes,
@@ -56,9 +62,15 @@ _M.label = function (opts)
 
 	tsukilib.helper.set_metatable(widget, labelMetatable)
 
+	local signals = opts.signals
+
+	opts.signals = nil
+
 	for k,v in pairs(opts) do
 		widget[k] = v
 	end
+
+	subscribe_signals(widget, signals)
 
 	return widget
 end
