@@ -293,7 +293,7 @@ static const luaL_Reg l_widget_fns[] = {
 
 int l_label_new(lua_State *L) {
 	GtkWidget *widget = gtk_label_new("");
-	GtkWidget **widget_ud = lua_newuserdata(L, sizeof(widget));
+	GtkWidget **widget_ud = lua_newuserdata(L, sizeof(GtkWidget **));
 
 	*widget_ud = widget;
 
