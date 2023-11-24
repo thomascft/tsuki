@@ -44,7 +44,7 @@ luaL_Reg l_tsuki_signal_fns[] = {
 	{NULL, NULL}
 };
 
-void l_tsuki_signal_fns_register(lua_State *L) {
+void signal_fns_register(lua_State *L) {
 	lua_getglobal(L, "tsukilib");
 
 	luaL_newlib(L, l_tsuki_signal_fns);
