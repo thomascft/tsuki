@@ -6,4 +6,4 @@ echo "lib path: ${TSUKI_LIB_PATH}"
 
  meson compile -C build
 
-./build/tsuki
+./build/src/tsuki

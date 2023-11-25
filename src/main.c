@@ -8,8 +8,8 @@
 #include <gtk/gtk.h>
 #include <string.h>
 
-#include "widgets.c"
-#include "signals.c"
+#include "widgets.h"
+#include "signals.h"
 
 void add_to_lua_path(lua_State *L) {
 	char new_path[1000] = "";
@@ -31,6 +31,11 @@ void add_to_lua_path(lua_State *L) {
 	lua_setfield(L, -2, "path");
 }
 
+void shutdown(GtkApplication *app, gpointer user_data) {
+	lua_State *L = (lua_State*)user_data;
+	lua_close(L);
+}
+
 void activate(GtkApplication *app, gpointer user_data) {
 	lua_State *L = luaL_newstate();
 	luaL_openlibs(L);
@@ -41,8 +46,8 @@ void activate(GtkApplication *app, gpointer user_data) {
 	lua_newtable(L);
 	lua_setglobal(L, "tsukilib");
 
-	l_tsuki_widget_fns_register(L);
-	l_tsuki_signal_fns_register(L);
+	widget_fns_register(L);
+	signal_fns_register(L);
 	add_to_lua_path(L);
 
 	char *config_path = getenv("TSUKI_CONFIG_PATH");
@@ -55,6 +60,8 @@ void activate(GtkApplication *app, gpointer user_data) {
 		printf("%s\n", lua_tostring(L, -1));
 		lua_pop(L, 1);
 	}
+
+	g_signal_connect(app, "shutdown", G_CALLBACK(shutdown), L);
 }
 
 int main(int argc, char *argv[]) {
