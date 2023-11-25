@@ -31,6 +31,11 @@ void add_to_lua_path(lua_State *L) {
 	lua_setfield(L, -2, "path");
 }
 
+void shutdown(GtkApplication *app, gpointer user_data) {
+	lua_State *L = (lua_State*)user_data;
+	lua_close(L);
+}
+
 void activate(GtkApplication *app, gpointer user_data) {
 	lua_State *L = luaL_newstate();
 	luaL_openlibs(L);
@@ -55,6 +60,8 @@ void activate(GtkApplication *app, gpointer user_data) {
 		printf("%s\n", lua_tostring(L, -1));
 		lua_pop(L, 1);
 	}
+
+	g_signal_connect(app, "shutdown", G_CALLBACK(shutdown), L);
 }
 
 int main(int argc, char *argv[]) {
