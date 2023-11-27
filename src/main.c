@@ -10,6 +10,7 @@
 
 #include "widgets.h"
 #include "signals.h"
+#include "service.h"
 
 void add_to_lua_path(lua_State *L) {
 	char new_path[1000] = "";
@@ -48,6 +49,7 @@ void activate(GtkApplication *app, gpointer user_data) {
 
 	widget_fns_register(L);
 	signal_fns_register(L);
+	service_fns_register(L);
 	add_to_lua_path(L);
 
 	char *config_path = getenv("TSUKI_CONFIG_PATH");

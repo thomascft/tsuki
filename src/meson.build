@@ -2,6 +2,7 @@ tsuki_src = files(
   'main.c',
   'widgets.c',
   'signals.c',
+  'service.c',
 )
 
 tsuki_deps = [
