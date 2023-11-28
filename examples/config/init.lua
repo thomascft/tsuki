@@ -5,7 +5,7 @@ local label1 = tsuki.widget.label({
 		--[[[1000] = function (self)
 			self.text = os.date("%H:%M:%S")
 		end]]
-		["data-updated"] = function (self, data)
+		["hyprland-changed"] = function (self, data)
 			self.text = data
 		end
 	},
@@ -19,4 +19,3 @@ local window1 = tsukilib.window.new()
 tsukilib.window.set_child(window1, label1)
 tsukilib.window.present(window1)
 
-tsukilib.service.update_data("Some other text")

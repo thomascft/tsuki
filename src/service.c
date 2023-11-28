@@ -1,4 +1,5 @@
 #include "service.h"
+#include "services/hyprland.h"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -30,6 +31,8 @@ static void service_class_init(ServiceClass *klass) {
 		1,
 		G_TYPE_STRING
 	);
+
+	register_hyprland_signals(klass);
 }
 
 static void service_init(Service *self) {
@@ -43,31 +46,10 @@ void service_update_data(Service *self, const gchar *new_data) {
 Service *service_new() {
 	return g_object_new(SERVICE_TYPE, NULL);
 }
-
-int l_service_update_data(lua_State *L) {
-	const gchar *user_data = lua_tostring(L, 1);
-	lua_getfield(L, LUA_REGISTRYINDEX, "ServiceInstance");
-	Service *service = lua_touserdata(L, -1);
-
-
-	service_update_data(service, user_data);
-
-	return 0;
-}
-
-
-static const luaL_Reg l_service_fns[] = {
-	{"update_data", l_service_update_data},
-	{NULL, NULL}
-};
-
-void service_fns_register(lua_State *L) {
-	Service *serviceinstance = service_new();
-	lua_pushlightuserdata(L, serviceinstance);
+void services_init(lua_State *L) {
+	Service *service = service_new();
+	lua_pushlightuserdata(L, service);
 	lua_setfield(L, LUA_REGISTRYINDEX, "ServiceInstance");
 
-	lua_getglobal(L, "tsukilib");
-	luaL_newlib(L, l_service_fns);
-	lua_setfield(L, -2, "service");
-	lua_pop(L, 1);
+	init_hyprland_service(service);
 }

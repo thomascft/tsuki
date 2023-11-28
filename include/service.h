@@ -17,6 +17,4 @@ void service_update_data(Service *self, const gchar *new_data);
 
 G_END_DECLS
 
-int l_service_new(lua_State *L);
-int l_service_update_data(lua_State *L);
-void service_fns_register(lua_State *L);
+void services_init(lua_State *L);

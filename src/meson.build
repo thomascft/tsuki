@@ -3,6 +3,7 @@ tsuki_src = files(
   'widgets.c',
   'signals.c',
   'service.c',
+  'services/hyprland.c',
 )
 
 tsuki_deps = [
