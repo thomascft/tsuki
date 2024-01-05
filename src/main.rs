@@ -2,60 +2,75 @@ use gtk::prelude::*;
 use gtk::glib;
 use gtk::Application;
 
-use mlua::{Lua, FromLua, UserData};
+use mlua::{Lua, FromLua, UserData, Error};
 
 use std::fs;
 use std::env;
 use std::path::PathBuf;
 
+trait WidgetImpl {
+    fn get_widget(&self) -> gtk::Widget;
+
+    fn css_classes(&self) -> Result<Vec<String>, Error>;
+    fn set_css_classes(&self, classes: Vec<String>) -> Result<(), Error>;
+
+    fn visible(&self) -> Result<bool, Error>;
+    fn set_visible(&self, visible: bool) -> Result<(), Error>;
+}
+
 #[derive(Clone, FromLua)]
 enum Widget {
     Label(gtk::Label),
-    Button(gtk::Button)
+    Button(gtk::Button),
 }
-impl Widget {
-    fn get(&self) -> gtk::Widget {
+
+impl WidgetImpl for Widget {
+    fn get_widget(&self) -> gtk::Widget {
         match self {
-            Widget::Label(label) => label.clone().upcast::<gtk::Widget>(),
-            Widget::Button(button) => button.clone().upcast::<gtk::Widget>()
+            Self::Label(w) => w.clone().upcast::<gtk::Widget>(),
+            Self::Button(w) => w.clone().upcast::<gtk::Widget>(),
         }
     }
+
+    fn css_classes(&self) -> Result<Vec<String>, Error> {
+        let w = self.get_widget();
+
+        Ok(w.css_classes()
+            .iter()
+            .map(|c| c.to_string())
+            .collect())
+    }
+    fn set_css_classes(&self, classes: Vec<String>) -> Result<(), Error>{
+        let w = self.get_widget();
+
+        Ok(w.set_css_classes(
+            &classes.iter()
+                .map(|c| c.as_str())
+                .collect::<Vec<&str>>()
+        ))
+    }
+
+    fn visible(&self) -> Result<bool, Error> {
+        let w = self.get_widget();
+
+        Ok(w.get_visible())
+    }
+    fn set_visible(&self, visible: bool) -> Result<(), Error> {
+        let w = self.get_widget();
+
+        Ok(w.set_visible(visible))
+    }
 }
+
 impl UserData for Widget {
     fn add_fields<'lua, F: mlua::UserDataFields<'lua, Self>>(fields: &mut F) {
-        fields.add_field_method_get("label", |_, this|{
-            let text = match this {
-                Widget::Label(label) => label.label().to_string(),
-                Widget::Button(button) => button.label().unwrap().to_string()
-            };
+        fields.add_field_method_get("classes", |_, this| this.css_classes());
+        fields.add_field_method_set("classes", |_, this, classes| this.set_css_classes(classes));
 
-            Ok(text)
-        })
+        fields.add_field_method_get("visible", |_, this| this.visible());
+        fields.add_field_method_set("visible", |_, this, visible| this.set_visible(visible));
     }
 }
-
-#[derive(Clone, FromLua)]
-enum Window {
-    Window(gtk::ApplicationWindow),
-}
-impl UserData for Window {
-    fn add_fields<'lua, F: mlua::UserDataFields<'lua, Self>>(fields: &mut F) {
-        fields.add_field_method_set("child", |_, this, widget: Widget|{
-            match this {
-                Window::Window(window) => window.set_child(Some(&widget.get())),
-            }
-            Ok(())
-        });
-    }
-    fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
-        methods.add_method("present", |_, this, ()| {
-            match this {
-                Window::Window(window) => window.present(),
-            }
-            Ok(())
-        });
-    }
-} 
 
 fn load_config() -> String {
     let mut fallback_config_path = PathBuf::from(env::var_os("HOME").unwrap_or_default());
@@ -77,31 +92,36 @@ fn main() -> glib::ExitCode {
         let lua = Lua::new();
 
         lua.scope(|scope|{
-            let window_new = scope.create_function(|_, ()|{
-                let window = gtk::ApplicationWindow::builder()
-                    .application(app)
-                    .build();
-                Ok(Window::Window(window))
-            })?;
-            let label_new = scope.create_function(|_, text: String|{
-                let label = gtk::Label::builder()
-                    .label(text)
-                    .build();
-
-                Ok(Widget::Label(label))
-            })?; 
-            let button_new = scope.create_function(|_, text: String|{
-                let button = gtk::Button::builder()
-                    .label(text)
-                    .build();
-
-                Ok(Widget::Button(button))
-            })?; 
-
             let globals = lua.globals();
-            globals.set("window", window_new)?;
+
+            let label_new = scope.create_function(|_, label: String| {
+                let w = gtk::Label::builder()
+                    .label(label)
+                    .build();
+
+                Ok(Widget::Label(w))
+            })?;
+            
+            let button_new = scope.create_function(|_, label: String| {
+                let w = gtk::Button::builder()
+                    .label(label)
+                    .build();
+
+                Ok(Widget::Button(w))
+            })?;
+ 
+            let test = scope.create_function(|_, w: Widget|{
+                gtk::ApplicationWindow::builder()
+                    .application(app)
+                    .child(&w.get_widget())
+                    .build()
+                    .present();
+                Ok(())
+            })?;
+
             globals.set("label", label_new)?;
             globals.set("button", button_new)?;
+            globals.set("test", test)?;
 
             let config = load_config();
             lua.load(config).exec()
