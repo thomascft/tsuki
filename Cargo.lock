@@ -869,6 +869,7 @@ version = "0.1.0"
 dependencies = [
  "gtk4",
  "mlua",
+ "xdg",
 ]
 
 [[package]]
@@ -985,3 +986,9 @@ checksum = "97a4882e6b134d6c28953a387571f1acdd3496830d5e36c5e3a1075580ea641c"
 dependencies = [
  "memchr",
 ]
+
+[[package]]
+name = "xdg"
+version = "2.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "213b7324336b53d2414b2db8537e56544d981803139155afa84f76eeebb7a546"

@@ -13,3 +13,6 @@ features = ["luau-jit", "macros"]
 [dependencies.gtk]
 package = "gtk4"
 version = "0.7.3"
+
+[dependencies]
+xdg = "^2.1"

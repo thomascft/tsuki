@@ -4,6 +4,10 @@ use gtk::Application;
 
 use mlua::{Lua, FromLua, UserData};
 
+use std::fs;
+use std::env;
+use std::path::PathBuf;
+
 #[derive(Clone, FromLua)]
 enum Widget {
     Label(gtk::Label),
@@ -53,6 +57,17 @@ impl UserData for Window {
     }
 } 
 
+fn load_config() -> String {
+    let mut fallback_config_path = PathBuf::from(env::var_os("HOME").unwrap_or_default());
+    fallback_config_path.push(".config");
+    fallback_config_path.push("init");
+    fallback_config_path.set_extension("luau");
+
+    let config_path = xdg::BaseDirectories::with_prefix("tsuki").unwrap().place_config_file("init.luau").unwrap_or(fallback_config_path);
+
+    fs::read_to_string(config_path).expect("Failed to read config")
+}
+
 fn main() -> glib::ExitCode {
     let app = Application::builder()
         .application_id("com.github.thomascft.tsuki")
@@ -88,16 +103,8 @@ fn main() -> glib::ExitCode {
             globals.set("label", label_new)?;
             globals.set("button", button_new)?;
 
-            lua.load(r#"
-                print("Hello World!")
-
-                local window = window()
-                local label = label("test")
-
-                window.child = label
-                window:present()
-
-            "#).exec()
+            let config = load_config();
+            lua.load(config).exec()
         }).unwrap();
     });
 
