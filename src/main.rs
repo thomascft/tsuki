@@ -1,8 +1,10 @@
+use gtk::Align;
 use gtk::prelude::*;
 use gtk::glib;
 use gtk::Application;
 
-use mlua::{Lua, FromLua, UserData, Error};
+use mlua::prelude::*;
+use mlua::{Lua, FromLua, UserData};
 
 use std::fs;
 use std::env;
@@ -11,11 +13,14 @@ use std::path::PathBuf;
 trait WidgetImpl {
     fn get_widget(&self) -> gtk::Widget;
 
-    fn css_classes(&self) -> Result<Vec<String>, Error>;
-    fn set_css_classes(&self, classes: Vec<String>) -> Result<(), Error>;
+    fn css_classes(&self) -> Result<Vec<String>, LuaError>;
+    fn set_css_classes(&self, classes: Vec<String>) -> Result<(), LuaError>;
 
-    fn visible(&self) -> Result<bool, Error>;
-    fn set_visible(&self, visible: bool) -> Result<(), Error>;
+    fn visible(&self) -> Result<bool, LuaError>;
+    fn set_visible(&self, visible: bool) -> Result<(), LuaError>;
+
+    fn halign(&self) -> Result<String, LuaError>;
+    fn set_halign(&self, halign: String) -> Result<(), LuaError>;
 }
 
 #[derive(Clone, FromLua)]
@@ -32,7 +37,7 @@ impl WidgetImpl for Widget {
         }
     }
 
-    fn css_classes(&self) -> Result<Vec<String>, Error> {
+    fn css_classes(&self) -> Result<Vec<String>, LuaError> {
         let w = self.get_widget();
 
         Ok(w.css_classes()
@@ -40,7 +45,7 @@ impl WidgetImpl for Widget {
             .map(|c| c.to_string())
             .collect())
     }
-    fn set_css_classes(&self, classes: Vec<String>) -> Result<(), Error>{
+    fn set_css_classes(&self, classes: Vec<String>) -> Result<(), LuaError>{
         let w = self.get_widget();
 
         Ok(w.set_css_classes(
@@ -50,15 +55,38 @@ impl WidgetImpl for Widget {
         ))
     }
 
-    fn visible(&self) -> Result<bool, Error> {
+    fn visible(&self) -> Result<bool, LuaError> {
         let w = self.get_widget();
 
         Ok(w.get_visible())
     }
-    fn set_visible(&self, visible: bool) -> Result<(), Error> {
+    fn set_visible(&self, visible: bool) -> Result<(), LuaError> {
         let w = self.get_widget();
 
         Ok(w.set_visible(visible))
+    }
+
+    fn halign(&self) -> Result<String, LuaError> {
+        let w = self.get_widget();
+
+        match w.halign() {
+            Align::End => Ok("end".to_string()),
+            Align::Fill => Ok("fill".to_string()),
+            Align::Start => Ok("start".to_string()),
+            Align::Center => Ok("center".to_string()),
+            Align::Baseline => Ok("baseline".to_string()),
+            _ => Err("Error matching halign".into_lua_err())
+        }
+    }
+    fn set_halign(&self, halign: String) -> Result<(), LuaError> {
+        let w = self.get_widget();
+
+        if "end".to_string() == halign { Ok(w.set_halign(Align::End)) }
+        else if "fill".to_string() == halign { Ok(w.set_halign(Align::Fill)) }
+        else if "start".to_string() == halign { Ok(w.set_halign(Align::Start)) }
+        else if "center".to_string() == halign { Ok(w.set_halign(Align::Center)) }
+        else if "baseline".to_string() == halign { Ok(w.set_halign(Align::Baseline)) }
+        else { Err(format!("align method: \"{}\" not found", halign).into_lua_err()) }
     }
 }
 
@@ -69,6 +97,10 @@ impl UserData for Widget {
 
         fields.add_field_method_get("visible", |_, this| this.visible());
         fields.add_field_method_set("visible", |_, this, visible| this.set_visible(visible));
+
+        fields.add_field_method_get("halign", |_, this| this.halign());
+        fields.add_field_method_set("halign", |_, this, halign| this.set_halign(halign));
+
     }
 }
 
