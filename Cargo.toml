@@ -15,4 +15,5 @@ package = "gtk4"
 version = "0.7.3"
 
 [dependencies]
+gtk4-layer-shell = "0.2"
 xdg = "^2.1"
