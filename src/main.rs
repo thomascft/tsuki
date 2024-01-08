@@ -8,6 +8,9 @@ use std::path::PathBuf;
 mod widgets;
 use widgets::Widget;
 
+mod surfaces;
+use surfaces::Surface;
+
 fn get_config_path() -> PathBuf {
     let xdg_dirs = xdg::BaseDirectories::with_prefix("tsuki").expect("Failed to init xdg_dirs");
 
@@ -46,18 +49,16 @@ fn main() -> glib::ExitCode {
                 Ok(Widget::Button(w))
             })?;
  
-            let test = scope.create_function(|_, w: Widget|{
-                gtk::ApplicationWindow::builder()
+            let window_new = scope.create_function(|_, ()| {
+                let w = gtk::ApplicationWindow::builder()
                     .application(app)
-                    .child(&w.get_widget())
-                    .build()
-                    .present();
-                Ok(())
+                    .build();
+                Ok(Surface::Window(w))
             })?;
 
             globals.set("label", label_new)?;
             globals.set("button", button_new)?;
-            globals.set("test", test)?;
+            globals.set("window", window_new)?;
 
             config_path.push("init.luau");
             lua.load(config_path).exec()
