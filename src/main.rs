@@ -1,6 +1,7 @@
 use gtk::glib;
 use gtk::prelude::*;
 use gtk::Application;
+use gtk4_layer_shell::{Edge, Layer, LayerShell};
 
 use mlua::prelude::*;
 use std::path::PathBuf;
@@ -53,6 +54,22 @@ fn main() -> glib::ExitCode {
 
             let window_new = scope.create_function(|_, ()| {
                 let w = gtk::ApplicationWindow::builder().application(app).build();
+
+                w.init_layer_shell();
+                w.set_layer(Layer::Overlay);
+                w.auto_exclusive_zone_enable();
+                
+                let anchors = [
+                    (Edge::Left, true),
+                    (Edge::Right, true),
+                    (Edge::Top, true),
+                    (Edge::Bottom, false),
+                ];
+
+                for (anchor, state) in anchors {
+                    w.set_anchor(anchor, state);
+                }
+
                 Ok(Surface::Window(w))
             })?;
 
