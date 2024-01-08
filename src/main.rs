@@ -1,5 +1,5 @@
-use gtk::prelude::*;
 use gtk::glib;
+use gtk::prelude::*;
 use gtk::Application;
 
 use mlua::prelude::*;
@@ -28,31 +28,31 @@ fn main() -> glib::ExitCode {
         let globals = lua.globals();
         let mut config_path = get_config_path();
 
-        // Add ~/.config/tsuki/ to package.path 
-        globals.get::<_, LuaTable>("package").expect("Failed to get package table")
-            .set("path", format!("{0}?.luau;{0}?/init.luau", config_path.to_str().unwrap())).expect("Failed to set package.path");
+        // Add ~/.config/tsuki/ to package.path
+        globals
+            .get::<_, LuaTable>("package")
+            .expect("Failed to get package table")
+            .set(
+                "path",
+                format!("{0}?.luau;{0}?/init.luau", config_path.to_str().unwrap()),
+            )
+            .expect("Failed to set package.path");
 
-        lua.scope(|scope|{
+        lua.scope(|scope| {
             let label_new = scope.create_function(|_, label: String| {
-                let w = gtk::Label::builder()
-                    .label(label)
-                    .build();
+                let w = gtk::Label::builder().label(label).build();
 
                 Ok(Widget::Label(w))
             })?;
-            
+
             let button_new = scope.create_function(|_, label: String| {
-                let w = gtk::Button::builder()
-                    .label(label)
-                    .build();
+                let w = gtk::Button::builder().label(label).build();
 
                 Ok(Widget::Button(w))
             })?;
- 
+
             let window_new = scope.create_function(|_, ()| {
-                let w = gtk::ApplicationWindow::builder()
-                    .application(app)
-                    .build();
+                let w = gtk::ApplicationWindow::builder().application(app).build();
                 Ok(Surface::Window(w))
             })?;
 
@@ -62,7 +62,11 @@ fn main() -> glib::ExitCode {
 
             config_path.push("init.luau");
             lua.load(config_path).exec()
-        }).unwrap();
+        })
+        .unwrap_or_else(|e| {
+            println!("{e}");
+            app.quit()
+        });
     });
 
     app.run()

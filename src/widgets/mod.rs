@@ -19,19 +19,12 @@ impl Widget {
     fn css_classes(&self) -> Result<Vec<String>, LuaError> {
         let w = self.get_widget();
 
-        Ok(w.css_classes()
-            .iter()
-            .map(|c| c.to_string())
-            .collect())
+        Ok(w.css_classes().iter().map(|c| c.to_string()).collect())
     }
-    fn set_css_classes(&self, classes: Vec<String>) -> Result<(), LuaError>{
+    fn set_css_classes(&self, classes: Vec<String>) -> Result<(), LuaError> {
         let w = self.get_widget();
 
-        Ok(w.set_css_classes(
-            &classes.iter()
-                .map(|c| c.as_str())
-                .collect::<Vec<&str>>()
-        ))
+        Ok(w.set_css_classes(&classes.iter().map(|c| c.as_str()).collect::<Vec<&str>>()))
     }
 
     fn valign(&self) -> Result<String, LuaError> {
@@ -43,18 +36,25 @@ impl Widget {
             Align::Start => Ok("start".to_string()),
             Align::Center => Ok("center".to_string()),
             Align::Baseline => Ok("baseline".to_string()),
-            _ => Err("Error matching valign".into_lua_err())
+            _ => Err("Error matching valign".into_lua_err()),
         }
     }
     fn set_valign(&self, valign: String) -> Result<(), LuaError> {
         let w = self.get_widget();
 
-        if "end".to_string() == valign { Ok(w.set_valign(Align::End)) }
-        else if "fill".to_string() == valign { Ok(w.set_valign(Align::Fill)) }
-        else if "start".to_string() == valign { Ok(w.set_valign(Align::Start)) }
-        else if "center".to_string() == valign { Ok(w.set_valign(Align::Center)) }
-        else if "baseline".to_string() == valign { Ok(w.set_valign(Align::Baseline)) }
-        else { Err(format!("align method: \"{}\" not found", valign).into_lua_err()) }
+        if "end".to_string() == valign {
+            Ok(w.set_valign(Align::End))
+        } else if "fill".to_string() == valign {
+            Ok(w.set_valign(Align::Fill))
+        } else if "start".to_string() == valign {
+            Ok(w.set_valign(Align::Start))
+        } else if "center".to_string() == valign {
+            Ok(w.set_valign(Align::Center))
+        } else if "baseline".to_string() == valign {
+            Ok(w.set_valign(Align::Baseline))
+        } else {
+            Err(format!("align method: \"{}\" not found", valign).into_lua_err())
+        }
     }
 
     fn halign(&self) -> Result<String, LuaError> {
@@ -66,18 +66,25 @@ impl Widget {
             Align::Start => Ok("start".to_string()),
             Align::Center => Ok("center".to_string()),
             Align::Baseline => Ok("baseline".to_string()),
-            _ => Err("Error matching halign".into_lua_err())
+            _ => Err("Error matching halign".into_lua_err()),
         }
     }
     fn set_halign(&self, halign: String) -> Result<(), LuaError> {
         let w = self.get_widget();
 
-        if "end".to_string() == halign { Ok(w.set_halign(Align::End)) }
-        else if "fill".to_string() == halign { Ok(w.set_halign(Align::Fill)) }
-        else if "start".to_string() == halign { Ok(w.set_halign(Align::Start)) }
-        else if "center".to_string() == halign { Ok(w.set_halign(Align::Center)) }
-        else if "baseline".to_string() == halign { Ok(w.set_halign(Align::Baseline)) }
-        else { Err(format!("align method: \"{}\" not found", halign).into_lua_err()) }
+        if "end".to_string() == halign {
+            Ok(w.set_halign(Align::End))
+        } else if "fill".to_string() == halign {
+            Ok(w.set_halign(Align::Fill))
+        } else if "start".to_string() == halign {
+            Ok(w.set_halign(Align::Start))
+        } else if "center".to_string() == halign {
+            Ok(w.set_halign(Align::Center))
+        } else if "baseline".to_string() == halign {
+            Ok(w.set_halign(Align::Baseline))
+        } else {
+            Err(format!("align method: \"{}\" not found", halign).into_lua_err())
+        }
     }
 
     fn vexpand(&self) -> Result<bool, LuaError> {
@@ -112,7 +119,7 @@ impl Widget {
 
         Ok(w.set_width_request(width))
     }
-    
+
     fn height(&self) -> Result<i32, LuaError> {
         let w = self.get_widget();
 

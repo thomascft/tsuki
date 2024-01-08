@@ -4,15 +4,15 @@ use mlua::prelude::*;
 #[derive(Clone, FromLua)]
 
 // I'm using an enum similar to the Widget enum so I can eventually add things like a lockscreen
-// type 
+// type
 pub enum Surface {
-    Window(gtk::ApplicationWindow)
+    Window(gtk::ApplicationWindow),
 }
 
 impl Surface {
     fn get_surface(&self) -> gtk::ApplicationWindow {
         match self {
-            Self::Window(w) => w.clone()
+            Self::Window(w) => w.clone(),
         }
     }
 
